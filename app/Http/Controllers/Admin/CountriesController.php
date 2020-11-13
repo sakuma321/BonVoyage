@@ -10,6 +10,7 @@ class CountriesController extends Controller
 {
 
     public function add(){
+
         return view('admin.countries.create');
 
 
@@ -36,8 +37,8 @@ class CountriesController extends Controller
 
         $country->save();
 
-           return redirect('/admin/countries/create');         
-        // return view('front.introduction',["country"=> $country]);
+           return redirect('/admin/travel');         
+       
     
     }
 
@@ -45,6 +46,44 @@ class CountriesController extends Controller
         $posts = Country::all();
         return view('admin.countries.index', ['posts' => $posts]);
 
+    }
+
+    public function edit(Request $request){
+        $country = Country::findOrFail($request->id);
+
+        return view('admin.countries.edit',['country_form' => $country]);
+
+    }
+
+    public function update(Request $request){
+        dd($request);
+        $country = Country::find($request->id);
+        $country_form = $request->all();
+        
+        if($request->remove == 'true'){
+            $country_form['image']=null;
+        }elseif($request->file('image')){
+            $path = $request ->file('image')->store('public/image');
+            $country_form['image']= basename($path);
+        }else{
+            $country_form['image'] = $country->image;
+        }
+        
+        unset($country_form['image']);
+        unset($country_form['remove']);
+        unset($country_form['_token']);
+        
+        $country->fill($country_form)->save();
+        
+        return redirect('admin.countries.index');
+        
+    }
+    
+    public function delete(Request $request){
+        $country = Country::find($request->id);
+
+        $country->delete();
+        return redirect('admin.countries.index');
     }
 
     public function show($id){

@@ -16,25 +16,36 @@ Route::get('/', function () {
     return view('top');
 });
 
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home_search', 'HomeController@search')->name('home');
 
 
 Route::group(['prefix' => 'admin', "middleware" => "auth"], function(){
-    // 投稿フォームページ
-    Route::post('countries/create','Admin\CountriesController@create');
-    Route::get('countries/create','Admin\CountriesController@add');
-
+    
     Route::get('travel', 'Admin\CountriesController@index');
 
-    Route::get('practice','PracticeController@add');
-   
-    Route::get('cities/create','CitiesController@create');
-    Route::post('cities/create','CitiesController@store');
-    Route::get('cities','CitiesController@index');
+    
+    Route::group(['prefix'=> 'countries'], function(){
+
+    //   国
+        Route::post('create','Admin\CountriesController@create');
+        Route::get('create','Admin\CountriesController@add');
+    // 編集
+        Route::get('edit','Admin\CountriesController@edit');
+        Route::post('edit','Admin\CountriesController@update');
+        Route::get('delete','Admin\CountriesController@delete');
+
+
+    
+    //   都市
+        Route::get('{contry_id}/cities/create','CitiesController@create');
+        Route::post('{contry_id}/cities/create','CitiesController@store');
+        Route::get('{contry_id}/cities','CitiesController@index');
+    });
+    
 
 });
 
 Route::get("country/{id}","Admin\CountriesController@show");
 
+Auth::routes();
